@@ -1,14 +1,15 @@
-@echo off
-echo [%date% %time%]: START
+#!/bin/bash
 
-echo [%date% %time%]: Creating env with Python 3.8 version
-call conda create --prefix ./env python=3.8 -y
+echo [$(date)]: "START"
 
-echo [%date% %time%]: Activating the environment
-call conda activate ./env
+echo [$(date)]: "Creating env with Python 3.8 version"
+conda create --prefix ./env python=3.8 -y
 
-echo [%date% %time%]: Installing the dev requirements
+echo [$(date)]: "Activating the environment"
+source /c/Users/ASUS/anaconda/etc/profile.d/conda.sh
+conda activate ./env
+
+echo [$(date)]: "Installing the dev requirements"
 pip install -r requirements.txt
 
-echo [%date% %time%]: END
-pause
+echo [$(date)]: "END"
