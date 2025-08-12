@@ -18,9 +18,13 @@ class ModelTrainer:
     def __init__(self):
         self.model_trainer_config = ModelTrainerConfig()
     
-    def initiate_model_training(self, train_array, test_array):
+    def initiate_model_trainer(self, train_array, test_array):
+        """
+        Trains multiple regression models, evaluates them, selects the best one, 
+        and saves the trained model to a pickle file.
+        """
         try:
-            logging.info('Splitting Dependent and Independent variables from train and test data')
+            logging.info('Splitting features and target from train and test data')
 
             X_train, y_train, X_test, y_test = (
                 train_array[:, :-1],
@@ -29,6 +33,7 @@ class ModelTrainer:
                 test_array[:, -1]
             )
 
+            # Define models to train
             models = {
                 'LinearRegression': LinearRegression(),
                 'Lasso': Lasso(),
@@ -36,30 +41,30 @@ class ModelTrainer:
                 'ElasticNet': ElasticNet()
             }
             
-            # Evaluate all models
+            logging.info('Evaluating models...')
             model_report: dict = evaluate_model(X_train, y_train, X_test, y_test, models)
-            logging.info(f'Model Report : {model_report}')
+            logging.info(f'Model Report: {model_report}')
             print("\nModel Report:", model_report)
 
-            # Get best model score
+            # Get best model details
             best_model_score = max(model_report.values())
-
-            # Get best model name
             best_model_name = max(model_report, key=model_report.get)
             best_model = models[best_model_name]
 
-            # Train best model
+            logging.info(f'Best Model: {best_model_name} | R2 Score: {best_model_score}')
+            print(f"\nBest Model Found: {best_model_name} with R2 Score: {best_model_score}")
+
+            # Train the best model
             best_model.fit(X_train, y_train)
 
-            print(f"\nBest Model Found: {best_model_name} with R2 Score: {best_model_score}")
-            logging.info(f'Best Model Found: {best_model_name} with R2 Score: {best_model_score}')
-
-            # Save trained model
+            # Save the best model
             save_object(
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=best_model
             )
 
+            logging.info("Best model saved successfully.")
+
         except Exception as e:
-            logging.info('Exception occurred at Model Training')
+            logging.info('Exception occurred in initiate_model_trainer')
             raise customexception(e, sys)
